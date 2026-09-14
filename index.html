@@ -63,6 +63,18 @@
   .note{font-size:11px;color:var(--mut);text-align:center;margin-top:26px;}
   .kv{font-size:13px;}
   .kv b{color:var(--acc);}
+  /* content grid */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media(max-width:640px){.cards{grid-template-columns:1fr 1fr;}}
+  @media(max-width:400px){.cards{grid-template-columns:1fr;}}
+  .cc{border:1px solid var(--line);border-radius:12px;padding:12px 13px;background:var(--bg);}
+  .cc .ic{font-size:18px;}
+  .cc .t{font-weight:800;font-size:13px;margin-top:2px;}
+  .cc .d{font-size:12px;color:var(--mut);margin-top:3px;}
+  .sport th:first-child{width:120px;}
+  .sport b{color:var(--acc);}
+  .events{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px;}
+  .events span{background:var(--pill);color:var(--acc);font-size:12px;font-weight:700;border-radius:999px;padding:3px 11px;}
 </style>
 </head>
 <body>
@@ -94,7 +106,31 @@
 </section>
 
 <section>
-  <h2><span class="n">2</span>会員データはどこから来るか（＝実査で確定）</h2>
+  <h2><span class="n">2</span>カルテの中身（会員が見る画面）</h2>
+  <p class="lead">9/4モックの構成。ざっくりこういう項目が並びます。</p>
+  <div class="cards">
+    <div class="cc"><div class="ic">🏃</div><div class="t">競技別の重点</div><div class="d">競技を選ぶと、その競技で伸ばすべき種目にハイライト</div></div>
+    <div class="cc"><div class="ic">📈</div><div class="t">推移グラフ＋前回比</div><div class="d">種目ごとの伸びを時系列で。前回からの変化も表示</div></div>
+    <div class="cc"><div class="ic">🏆</div><div class="t">自己ベスト</div><div class="d">種目ごとのベスト記録</div></div>
+    <div class="cc"><div class="ic">🎬</div><div class="t">フォーム動画 Before/After</div><div class="d">走り方の変化を並べて確認</div></div>
+    <div class="cc"><div class="ic">📝</div><div class="t">トレーナー所見</div><div class="d">コメント・次の課題</div></div>
+    <div class="cc"><div class="ic">🥇</div><div class="t">スタジオ対抗ランキング</div><div class="d">イニシャル表示（氏名は出さない）</div></div>
+  </div>
+  <h3>競技別の重点（モックの内容）</h3>
+  <div class="events"><span>最高速度</span><span>200m走</span><span>1500m走</span><span>1分間走</span><span>5分間走</span><span>30秒間走</span></div>
+  <table class="sport">
+    <tr><th>競技</th><th>重点種目</th><th>ねらい</th></tr>
+    <tr><td>サッカー</td><td><b>最高速度・30秒間走・1分間走</b></td><td>スプリントの反復力。試合終盤でも落ちない加速</td></tr>
+    <tr><td>陸上・短距離</td><td><b>最高速度・200m走</b></td><td>トップスピードと維持。後半の失速を抑える</td></tr>
+    <tr><td>陸上・長距離</td><td><b>1500m走・5分間走</b></td><td>持久的スピード。粘れる心肺と一定ペース</td></tr>
+    <tr><td>野球</td><td><b>最高速度・30秒間走</b></td><td>一塁到達・盗塁の初速。短い距離の爆発力</td></tr>
+    <tr><td>バスケ</td><td><b>30秒間走・最高速度</b></td><td>反復スプリントと上下動。コート往復で落ちない脚</td></tr>
+  </table>
+  <p class="kv" style="margin-top:8px">※競技・重点は<b>後から追加・調整できる</b>作り（山崎様の要望で足せる）。数値・氏名はすべて例（ダミー）。</p>
+</section>
+
+<section>
+  <h2><span class="n">3</span>会員データはどこから来るか（＝実査で確定）</h2>
   <p class="lead">新しいAPI連携は不要。いま動いている仕組みを流用できることを確認済み。</p>
   <div class="flow">
     <div class="step"><div class="t">hacomono</div><div class="d">会員エクスポート（会員番号・氏名・店舗）</div></div>
@@ -108,7 +144,7 @@
 </section>
 
 <section>
-  <h2><span class="n">3</span>測定値の入力（2通り）</h2>
+  <h2><span class="n">4</span>測定値の入力（2通り）</h2>
   <h3>① 手入力フォーム（先行実装・すぐ動く）</h3>
   <p class="kv">会員を選ぶ → 測定日 → 種目に数値を打つ。実測の軸は<b>最高速・1分間走（3ヶ月ごと）</b>。種目は後から追加可能（3000m等）。</p>
   <h3>② 写真読み取り（OCR・Phase2）</h3>
@@ -125,7 +161,7 @@
 </section>
 
 <section>
-  <h2><span class="n">4</span>作る順番（3ステップ）</h2>
+  <h2><span class="n">5</span>作る順番（3ステップ）</h2>
   <div class="phase">
     <div class="ph p1"><span class="num">Phase 1</span><p class="kv" style="margin-top:8px"><b>実用最小</b><br>ログイン／名簿同期／手入力／カルテ表示<br><b>→ これで運用開始できる</b></p></div>
     <div class="ph"><span class="num">Phase 2</span><p class="kv" style="margin-top:8px"><b>写真OCR</b><br>紙を撮って数値入力＋元画像保管</p></div>
@@ -135,7 +171,7 @@
 </section>
 
 <section>
-  <h2><span class="n">5</span>技術の土台（確定）</h2>
+  <h2><span class="n">6</span>技術の土台（確定）</h2>
   <table>
     <tr><th>項目</th><th>採用</th><th>理由</th></tr>
     <tr><td>画面</td><td>モックv2をテンプレ化（Next.js）</td><td>広告ダッシュと同構成・見た目は完成済み</td></tr>
@@ -147,7 +183,7 @@
 </section>
 
 <section>
-  <h2><span class="n">6</span>まだ埋めるところ（実装と並行で確定）</h2>
+  <h2><span class="n">7</span>まだ埋めるところ（実装と並行で確定）</h2>
   <ul>
     <li><b>山崎様</b>：カルテに入れたい追加項目／実測種目の最終確認（提案書6種目 vs 実態＝最高速・1分間走）</li>
     <li><b>坪井様</b>：色・ロゴ（見積後）</li>
