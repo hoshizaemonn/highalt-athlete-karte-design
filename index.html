@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アスリートカルテ 設計まとめ</title>
+<style>
+  :root{
+    --ink:#1f2937; --mut:#6b7280; --line:#e2e8f0; --bg:#f6f8fc; --card:#fff;
+    --acc:#1d4ed8; --acc2:#2563eb; --ok:#059669; --okbg:#ecfdf5; --okline:#a7f3d0;
+    --warn:#b45309; --warnbg:#fffbeb; --warnline:#fde68a; --pill:#eef2ff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.7;
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;}
+  .wrap{max-width:960px;margin:0 auto;padding:24px 16px 64px;}
+  header{text-align:center;padding:28px 16px 20px;}
+  header h1{font-size:26px;font-weight:800;margin:0;letter-spacing:.02em;}
+  header .sub{color:var(--mut);font-size:13px;margin-top:8px;}
+  header .tag{display:inline-block;background:var(--pill);color:var(--acc);font-size:12px;font-weight:700;
+    padding:4px 12px;border-radius:999px;margin-top:12px;}
+  section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 20px;margin-top:18px;
+    box-shadow:0 6px 24px rgba(29,78,216,.05);}
+  h2{font-size:18px;font-weight:800;margin:0 0 14px;display:flex;align-items:center;gap:9px;}
+  h2 .n{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;width:28px;height:28px;border-radius:8px;
+    display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:none;}
+  h3{font-size:14px;font-weight:800;margin:18px 0 8px;color:var(--acc);}
+  p{margin:6px 0;}
+  .lead{color:var(--mut);font-size:13px;margin:-4px 0 6px;}
+  /* flow */
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:6px 0;}
+  .step{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;flex:1;min-width:140px;}
+  .step .t{font-weight:800;font-size:13px;}
+  .step .d{font-size:12px;color:var(--mut);margin-top:3px;}
+  .arrow{align-self:center;color:var(--acc);font-weight:800;padding:0 8px;font-size:18px;}
+  @media(max-width:560px){.arrow{transform:rotate(90deg);width:100%;text-align:center;padding:4px 0;}}
+  /* roles */
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media(max-width:560px){.roles{grid-template-columns:1fr;}}
+  .role{border:1px solid var(--line);border-radius:12px;padding:14px;}
+  .role .h{font-weight:800;font-size:14px;margin-bottom:6px;}
+  .role .r{font-size:12px;color:var(--mut);}
+  .role.m{border-top:4px solid #2563eb;}
+  .role.s{border-top:4px solid #059669;}
+  .role.a{border-top:4px solid #b45309;}
+  /* badges */
+  .ok{background:var(--okbg);border:1px solid var(--okline);color:#065f46;border-radius:12px;padding:12px 14px;font-size:13px;margin:8px 0;}
+  .warn{background:var(--warnbg);border:1px solid var(--warnline);color:#92400e;border-radius:12px;padding:12px 14px;font-size:13px;margin:8px 0;}
+  ul{margin:6px 0;padding-left:20px;}
+  li{margin:4px 0;font-size:13.5px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+  th{background:var(--bg);font-weight:700;}
+  .phase{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  @media(max-width:560px){.phase{grid-template-columns:1fr;}}
+  .ph{border:1px solid var(--line);border-radius:12px;padding:14px;}
+  .ph .num{font-size:12px;font-weight:800;color:#fff;background:var(--acc);border-radius:999px;padding:2px 10px;display:inline-block;}
+  .ph.p1{background:linear-gradient(180deg,#eff6ff,#fff);}
+  .money{display:flex;flex-wrap:wrap;gap:12px;}
+  .money .c{flex:1;min-width:150px;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;}
+  .money .c .v{font-size:22px;font-weight:800;color:var(--acc);}
+  .money .c .l{font-size:12px;color:var(--mut);margin-top:4px;}
+  .note{font-size:11px;color:var(--mut);text-align:center;margin-top:26px;}
+  .kv{font-size:13px;}
+  .kv b{color:var(--acc);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>アスリートカルテ 設計まとめ</h1>
+  <div class="sub">9/4モックの実用化／2026-09-14 設計①②③ 完了時点</div>
+  <div class="tag">鈴木さん共有用・「この設計で実装します」の許可をいただくための資料</div>
+</header>
+
+<section>
+  <h2><span class="n">◎</span>ひとことで言うと</h2>
+  <p><b>9/4のモック（見た目は完成形）に「ログイン・保存・入力・写真読取」の裏側を付けて本番化する。</b>
+  会員は自分のカルテだけ見られ、スタッフが測定値を入力（手入力＋紙の写真読取）。会員名簿はhacomonoから自動同期。</p>
+  <div class="ok">✅ <b>大きな新規開発は少ない</b>：ログインは広告ダッシュの仕組みを転用／会員名簿は既存のhacomono取込を流用／画面はモックそのまま。＝<b>工数を圧縮できる</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">1</span>誰が・何を見られるか</h2>
+  <div class="roles">
+    <div class="role m"><div class="h">会員</div><div class="r">会員番号＋PWでログイン<br><b>自分のカルテだけ</b>閲覧<br>（推移・自己ベスト・所見・動画）</div></div>
+    <div class="role s"><div class="h">スタッフ</div><div class="r"><b>自店舗の会員だけ</b><br>測定値の入力／写真読取／<br>アスリート対象化・PW発行</div></div>
+    <div class="role a"><div class="h">マスター</div><div class="r"><b>全店舗</b><br>上記＋名簿同期・<br>種目/メニュー編集・エクスポート</div></div>
+  </div>
+  <div class="warn">🔒 <b>本人分離が最重要</b>：ログイン情報（cookie）のIDだけを信じ、URLに他人のIDを入れても弾く。他人のカルテは1件も見えない設計。</div>
+  <p class="kv" style="margin-top:10px">対象＝<b>アスリートコース向けのみ</b>。ハイアルチ塾（子ども）は今回スコープ外。ランキングは氏名でなく<b>イニシャル表示</b>（個人情報配慮）。</p>
+  <p class="kv">ログインの保持：<b>会員は1ヶ月</b>（怪我・休養で2週間開かなくても切れない）／<b>スタッフは2週間</b>（お盆・年末年始の休みを挟んでも切れない）。</p>
+</section>
+
+<section>
+  <h2><span class="n">2</span>会員データはどこから来るか（＝実査で確定）</h2>
+  <p class="lead">新しいAPI連携は不要。いま動いている仕組みを流用できることを確認済み。</p>
+  <div class="flow">
+    <div class="step"><div class="t">hacomono</div><div class="d">会員エクスポート（会員番号・氏名・店舗）</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="t">自動取得（Playwright）</div><div class="d">広告側の仕組みを流用・取得先を差し替え</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="t">カルテDB(Supabase)</div><div class="d">membersに自動登録（会員番号キー）</div></div>
+  </div>
+  <div class="ok">✅ 会員番号・氏名を取る導線は <b>PLダッシュボード側に既にある</b>（<code>upload.py</code>が消化済み）。＝<b>松尾さんのhacomono自動取込の依頼と同じ導線</b>で共通実装にできる。</div>
+  <p class="kv">スタッフの手作業は「<b>この会員をアスリート対象にする</b>」フラグを立てるだけ（名簿の手入力なし）。</p>
+</section>
+
+<section>
+  <h2><span class="n">3</span>測定値の入力（2通り）</h2>
+  <h3>① 手入力フォーム（先行実装・すぐ動く）</h3>
+  <p class="kv">会員を選ぶ → 測定日 → 種目に数値を打つ。実測の軸は<b>最高速・1分間走（3ヶ月ごと）</b>。種目は後から追加可能（3000m等）。</p>
+  <h3>② 写真読み取り（OCR・Phase2）</h3>
+  <div class="flow">
+    <div class="step"><div class="t">紙を撮影</div><div class="d">記録用紙をカメラで</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="t">AIが数値抽出</div><div class="d">Claude visionで読取（下書き）</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="t">人が確認・修正</div><div class="d">元画像と並べて1項目ずつ</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="t">確定保存</div><div class="d">直してから保存</div></div>
+  </div>
+  <div class="warn">⚠️ <b>必ず人が確認してから保存</b>（誤読対策）。氏名などの個人情報はAIに渡さない。</div>
+</section>
+
+<section>
+  <h2><span class="n">4</span>作る順番（3ステップ）</h2>
+  <div class="phase">
+    <div class="ph p1"><span class="num">Phase 1</span><p class="kv" style="margin-top:8px"><b>実用最小</b><br>ログイン／名簿同期／手入力／カルテ表示<br><b>→ これで運用開始できる</b></p></div>
+    <div class="ph"><span class="num">Phase 2</span><p class="kv" style="margin-top:8px"><b>写真OCR</b><br>紙を撮って数値入力＋元画像保管</p></div>
+    <div class="ph"><span class="num">Phase 3</span><p class="kv" style="margin-top:8px"><b>拡充</b><br>日々の記録・期間ビュー・メニュー(1A〜5)・エクスポート</p></div>
+  </div>
+  <p class="kv" style="margin-top:12px">スケジュール：<b>9月中に形 → 10月調整 → 11月 会員展開</b>（鈴木さん「今週着手なら今週で形」）。</p>
+</section>
+
+<section>
+  <h2><span class="n">5</span>技術の土台（確定）</h2>
+  <table>
+    <tr><th>項目</th><th>採用</th><th>理由</th></tr>
+    <tr><td>画面</td><td>モックv2をテンプレ化（Next.js）</td><td>広告ダッシュと同構成・見た目は完成済み</td></tr>
+    <tr><td>ログイン</td><td>会員番号＋PW（bcrypt）</td><td>広告ダッシュ auth.ts を転用</td></tr>
+    <tr><td>DB</td><td>Supabase（既存の組織・星崎管理）</td><td>過去データを永続保存・本人分のみ表示(RLS)</td></tr>
+    <tr><td>写真読取</td><td>Claude API（vision）</td><td>紙→数値・確認画面で人が修正</td></tr>
+    <tr><td>公開</td><td>Web（アプリ化不要）／Vercel</td><td>URL固定でログイン出し分け</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2><span class="n">6</span>まだ埋めるところ（実装と並行で確定）</h2>
+  <ul>
+    <li><b>山崎様</b>：カルテに入れたい追加項目／実測種目の最終確認（提案書6種目 vs 実態＝最高速・1分間走）</li>
+    <li><b>坪井様</b>：色・ロゴ（見積後）</li>
+    <li><b>アスリートメニュー一覧（紙）</b>：1A〜5の体系（明日明後日に現物）→ 後から追加できる作りなのでリリースを止めない</li>
+    <li>hacomono会員エクスポートの実カラム・記録用紙の実物フォーマット（実CSV／紙で最終確認）</li>
+  </ul>
+</section>
+
+<p class="note">株式会社斗（hishaku）／2026-09-14 作成・社内共有用（ダミー・実データなし）</p>
+
+</div>
+</body>
+</html>
